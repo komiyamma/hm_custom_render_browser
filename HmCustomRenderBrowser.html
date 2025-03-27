@@ -9,10 +9,10 @@
 <script>
 document.addEventListener('DOMContentLoaded', ()=>{
     // １秒に一度データを受け取る
-    HmCustomRenderBrowser.setInterval(onDataReceive, 1000);
+    HmCustomRenderBrowser.setInterval(onReceiveObject, 1000);
 })
 
-function onDataReceive(obj, error) {
+function onReceiveObject(obj, error) {
     if (obj) {
         output.innerText = obj.text;
     }
