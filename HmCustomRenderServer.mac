@@ -4,8 +4,8 @@ execjs currentmacrodirectory + "\\HmCustomRenderServer.js";
 
 js {
 
-// 非同期関数なので非同期中に使える関数で構築する必要あり
-function makeSendObject() {
+// オーバーライド。非同期関数なので非同期中に使える関数で構築する必要あり
+function onRequestObject() {
     var obj = {
         text: gettotaltext(),
         column: column(),
@@ -15,6 +15,7 @@ function makeSendObject() {
     return obj;
 }
 
+// オーバーライド。非同期関数なので非同期中に使える関数で構築する必要あり
 function showCustomRenderPane(url) {
 
     browserpanecommand({

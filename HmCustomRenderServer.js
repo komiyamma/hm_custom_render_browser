@@ -9,7 +9,7 @@ var server = hidemaru.createHttpServer({ makeKey: 1 }, function (req, res) {
     if (req.url == "/" + server.key) {
         res.writeHead(200); // OK
 
-        var obj = makeSendObject();
+        var obj = onRequestObject();
         res.write(JSON.stringify(obj));
         res.end("");
     } else {
@@ -19,7 +19,7 @@ var server = hidemaru.createHttpServer({ makeKey: 1 }, function (req, res) {
 });
 
 // 非同期関数なので非同期中に使える関数で構築する必要あり
-function makeSendObject() {
+function onRequestObject() {
     var obj = {
         text: gettotaltext(),
     };
@@ -56,6 +56,17 @@ function showCustomRenderBrowser() {
         showCustomRenderPane(url);
     }
 }
+
+function showCustomRenderPane(url) {
+
+    browserpanecommand({
+        target: "_each",
+        url: url,
+        show: 1,
+        size: 500,
+    });
+}
+
 
 // 同期で処理せず、非同期で処理することで、マクロ実行で一瞬固まるのを回避する。
 var timerHandle;
