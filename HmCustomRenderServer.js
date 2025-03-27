@@ -1,8 +1,4 @@
-﻿jsmode "JScript\\" + currentmacrofilename;
-
-js {
-
-var currentMacroDirectory = currentmacrodirectory();
+﻿var currentMacroDirectory = currentmacrodirectory();
 
 if (typeof (server) != "undefined") {
     server.close();
@@ -14,7 +10,6 @@ var server = hidemaru.createHttpServer({ makeKey: 1 }, function (req, res) {
         res.writeHead(200); // OK
 
         var obj = makeSendObject();
-
         res.write(JSON.stringify(obj));
         res.end("");
     } else {
@@ -27,8 +22,6 @@ var server = hidemaru.createHttpServer({ makeKey: 1 }, function (req, res) {
 function makeSendObject() {
     var obj = {
         text: gettotaltext(),
-        column: column(),
-        lineno: lineno()
     };
 
     return obj;
@@ -57,15 +50,11 @@ function showCustomRenderBrowser() {
         return;
     }
 
-    var absoluteUrl = makeUrl(currentMacroDirectory + "\\HmCustomRenderBrowser.html", server.port, server.key);
+    var url = makeUrl(currentMacroDirectory + "\\HmCustomRenderBrowser.html", server.port, server.key);
 
-    // 指定のパラメータでレンダーペインを開く。browserpanecommand にして、targetを "_each" にしてもほぼ同じこと
-    browserpanecommand({
-        target: "_each",
-        url: absoluteUrl,
-        show: 1,
-        size: 500,
-    });
+    if (showCustomRenderPane) { 
+        showCustomRenderPane(url);
+    }
 }
 
 // 同期で処理せず、非同期で処理することで、マクロ実行で一瞬固まるのを回避する。
@@ -76,5 +65,3 @@ if (typeof(timerHandle) != "undefined") {
 }
 
 timerHandle = hidemaru.setTimeout(showCustomRenderBrowser, 0);
-
-} // js
