@@ -1,4 +1,6 @@
-﻿jsmode "JScript\\" + currentmacrofilename;
+﻿hidemaruversion "9.43.99";
+
+jsmode "JScript\\" + currentmacrofilename;
 
 execjs currentmacrodirectory + "\\HmCustomRenderServer.js";
 
