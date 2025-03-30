@@ -4,6 +4,7 @@
     let urlLocationParams = new URLSearchParams(window.location.search);
     let urlLocationPort = Number(urlLocationParams.get('port'));
     let urlLocationKey = urlLocationParams.get('key');
+    let urlFuncID = Number(urlLocationParams.get('funcid'));
 
     async function updateTick(callBackFunc) {
 
@@ -15,12 +16,12 @@
                 return response.json(); // テキストとして来るが、JSONもテキストなので、JSONオブジェクト解釈。
             })
             .then(obj => {
-                if (callBackFunc && typeof callBackFunc === 'function') {
+                if (typeof(callBackFunc) == "function") {
                     callBackFunc(obj, null);
                 }
             })
             .catch(error => {
-                if (callBackFunc && typeof callBackFunc === 'function') {
+                if (typeof(callBackFunc) == "function") {
                     callBackFunc(null, error);
                 }
             }
@@ -44,6 +45,11 @@
         clearTimeout: function(timerHandle) {
              window.clearTimeout(timerHandle);
         },
+
+        sendObjectFromRenderPane(obj) {
+            var json = JSON.stringify(obj);
+            window.chrome.webview.postMessage({ funcid: urlFuncID, message: json });
+        }
     }
 })();
 

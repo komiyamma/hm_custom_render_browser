@@ -34,12 +34,22 @@ function onRequestObject() {
     return obj;
 }
 
+function proxyOnReceiveObjectFromRenderPane(json_text) {
+    try {
+        if (onReceiveObject && typeof(onReceiveObject) == "function") {
+            var json = JSON.parse(json_text);
+            onReceiveObject(json);
+        }
+    } catch(e) {
+    }
+}
 
-function makeUrl(htmlFullPath, port, key) {
+function makeUrl(htmlFullPath, port, key, funcid) {
     var absoluteUrl = new URL(htmlFullPath);
     var params = new URLSearchParams();
     params.set("port", String(port));
     params.set("key", String(key));
+    params.set("funcid", String(funcid));
     absoluteUrl.search = new URLSearchParams(params).toString();
     return absoluteUrl.href;
 }
@@ -60,7 +70,8 @@ function showCustomRenderBrowser() {
         return;
     }
 
-    var url = makeUrl(currentMacroDirectory + "\\HmCustomRenderBrowser.html", server.port, server.key);
+    var funcid = hidemaru.getFunctionId(proxyOnReceiveObjectFromRenderPane);
+    var url = makeUrl(currentMacroDirectory + "\\HmCustomRenderBrowser.html", server.port, server.key, funcid);
 
     if (showCustomRenderPane) { 
         showCustomRenderPane(url);
