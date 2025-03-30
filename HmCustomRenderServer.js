@@ -1,4 +1,5 @@
-﻿var currentMacroDirectory = currentmacrodirectory();
+﻿// HmCustomRenderServer.js ver 2.0.0.1
+var currentMacroDirectory = currentmacrodirectory();
 
 if (typeof (server) != "undefined") {
     server.close();
@@ -8,9 +9,15 @@ var server = hidemaru.createHttpServer({ makeKey: 1 }, function (req, res) {
 
     if (req.url == "/" + server.key) {
         res.writeHead(200); // OK
-
         var obj = onRequestObject();
         res.write(JSON.stringify(obj));
+        res.end("");
+    } else if (req.url.indexOf("/" + server.key + "/sendObject/") == 0) {
+        res.writeHead(200); // OK
+        var json_text = req.url;
+        json_text = json_text.replace("/" + server.key + "/sendObject/", "");
+        proxyOnReceiveObjectFromRenderPane(json_text);
+        res.write("{}");
         res.end("");
     } else {
         res.writeHead(404); // Not found

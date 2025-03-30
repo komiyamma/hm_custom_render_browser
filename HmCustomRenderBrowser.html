@@ -16,6 +16,8 @@ function onReceiveObject(obj, error) {
     if (obj) {
         output.innerText = obj.text;
     }
+
+    HmCustomRenderBrowser.sendObjectFromRenderPane({text:"ああああ"});
 }
 </script>
 </body>

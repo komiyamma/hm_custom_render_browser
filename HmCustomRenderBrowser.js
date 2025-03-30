@@ -1,4 +1,4 @@
-// ファイルURLからポート番号を取得
+// HmCustomRenderBrowser.js ver 2.0.0.1
 (function() {
     // ファイルURLからポート番号を取得
     let urlLocationParams = new URLSearchParams(window.location.search);
@@ -49,6 +49,19 @@
         sendObjectFromRenderPane(obj) {
             var json = JSON.stringify(obj);
             window.chrome.webview.postMessage({ funcid: urlFuncID, message: json });
+        },
+
+        sendObject(obj) {
+            let text = JSON.stringify(obj);
+            fetch(`http://localhost:${urlLocationPort}/${urlLocationKey}/sendObject/${encodeURIComponent(text)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                }
+            );
         }
     }
 })();
