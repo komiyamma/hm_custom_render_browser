@@ -1,4 +1,4 @@
-﻿// HmCustomRenderServer.WebView2.js ver 2.1.0.1
+﻿// HmCustomRenderServer.WebView2.js ver 2.0.0.1
 var _currentMacroDirectory = currentmacrodirectory();
 
 if (typeof (_httpServer) != "undefined") {

@@ -1,22 +1,22 @@
-﻿// HmCustomRenderServer.js ver 2.0.0.1
-var currentMacroDirectory = currentmacrodirectory();
+﻿// HmCustomRenderServer.js ver 2.1.0.1
+var _currentMacroDirectory = currentmacrodirectory();
 
-if (typeof (server) != "undefined") {
-    server.close();
+if (typeof (_httpServer) != "undefined") {
+    _httpServer.close();
 }
 
-var server = hidemaru.createHttpServer({ makeKey: 1 }, function (req, res) {
+var _httpServer = hidemaru.createHttpServer({ makeKey: 1 }, function (req, res) {
 
-    if (req.url == "/" + server.key) {
+    if (req.url == "/" + _httpServer.key) {
         res.writeHead(200); // OK
         var obj = onRequestObject();
         res.write(JSON.stringify(obj));
         res.end("");
-    } else if (req.url.indexOf("/" + server.key + "/sendObject/") == 0) {
+    } else if (req.url.indexOf("/" + _httpServer.key + "/sendObject/") == 0) {
         res.writeHead(200); // OK
         var json_text = req.url;
-        json_text = json_text.replace("/" + server.key + "/sendObject/", "");
-        proxyOnReceiveObjectFromRenderPane(json_text);
+        json_text = json_text.replace("/" + _httpServer.key + "/sendObject/", "");
+        _proxyOnReceiveObjectFromRenderPane(json_text);
         res.write("{}");
         res.end("");
     } else {
@@ -34,7 +34,7 @@ function onRequestObject() {
     return obj;
 }
 
-function proxyOnReceiveObjectFromRenderPane(json_text) {
+function _proxyOnReceiveObjectFromRenderPane(json_text) {
     try {
         if (typeof(onReceiveObject) == "function") {
             var json = JSON.parse(json_text);
@@ -44,30 +44,30 @@ function proxyOnReceiveObjectFromRenderPane(json_text) {
     }
 }
 
-function makeUrl(htmlFullPath, port, key, funcid) {
+function _makeUrl(htmlFullPath, port, key, funcid) {
     var htmlFullPath = htmlFullPath.replace(/\\/g, "/");
     var absoluteUrl = sprintf("file://%s?port=%s&key=%s&funcid=%s", encodeURI(htmlFullPath), port.toString(), key.toString(), funcid.toString());
     return absoluteUrl;
 }
 
-function outputAlert(msg) {
+function _outputAlert(msg) {
     var dll = loaddll("HmOutputPane.dll");
     dll.dllFuncW.OutputW(hidemaru.getCurrentWindowHandle(), msg + "\r\n");
 }
 
 
 // メインの処理
-function showCustomRenderBrowser() {
+function _showCustomRenderBrowser() {
 
-    server.listen(0); //ランダムなポート
+    _httpServer.listen(0); //ランダムなポート
 
-    if (server.port == 0) {
-        outputAlert("サーバー構築失敗");
+    if (_httpServer.port == 0) {
+        _outputAlert("サーバー構築失敗");
         return;
     }
 
-    var funcid = hidemaru.getFunctionId(proxyOnReceiveObjectFromRenderPane);
-    var url = makeUrl(currentMacroDirectory + "\\HmCustomRenderBrowser.html", server.port, server.key, funcid);
+    var funcid = hidemaru.getFunctionId(_proxyOnReceiveObjectFromRenderPane);
+    var url = _makeUrl(_currentMacroDirectory + "\\HmCustomRenderBrowser.html", _httpServer.port, _httpServer.key, funcid);
 
     if (showCustomRenderPane) { 
         showCustomRenderPane(url);
@@ -81,15 +81,16 @@ function showCustomRenderPane(url) {
         url: url,
         show: 1,
         size: 500,
+        initialize: "async",
     });
 }
 
 
 // 同期で処理せず、非同期で処理することで、マクロ実行で一瞬固まるのを回避する。
-var timerHandle;
+var _timerHandleShow;
 
-if (typeof(timerHandle) != "undefined") {
-    hidemaru.clearTimeout(timerHandle);
+if (typeof(_timerHandleShow) != "undefined") {
+    hidemaru.clearTimeout(_timerHandleShow);
 }
 
-timerHandle = hidemaru.setTimeout(showCustomRenderBrowser, 0);
+_timerHandleShow = hidemaru.setTimeout(_showCustomRenderBrowser, 0);
