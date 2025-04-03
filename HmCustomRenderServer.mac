@@ -25,6 +25,7 @@ function showCustomRenderPane(url) {
         url: url,
         show: 1,
         size: 500,
+        initialize: "async",
     });
 }
 
