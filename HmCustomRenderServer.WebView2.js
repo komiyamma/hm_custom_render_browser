@@ -26,7 +26,7 @@ var _httpServer1 = hidemaru.createHttpServer({ makeKey: 1 }, async (req, res) =>
 });
 
 
-var _httpServer2 = hidemaru.createHttpServer({ makeKey: 1 }, async (req, res) => {
+var _httpServer2 = hidemaru.createHttpServer(async (req, res) => {
 
     var url = req.url;
 
