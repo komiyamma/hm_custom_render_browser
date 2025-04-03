@@ -1,4 +1,4 @@
-﻿// HmCustomRenderServer.WebView2.js ver 2.0.0.1
+﻿// HmCustomRenderServer.WebView2.js ver 2.2.0.1
 var _currentMacroDirectory = currentmacrodirectory();
 
 if (typeof (_httpServer) != "undefined") {
@@ -19,10 +19,10 @@ var _httpServer = hidemaru.createHttpServer({ makeKey: 1 }, async (req, res) => 
         var obj = onRequestObject();
         res.write(JSON.stringify(obj));
         res.end("");
-    } else if (url.indexOf("/" + _httpServer.key + "/sendObject/") == 0) {
+    } else if (url.indexOf("/" + _httpServer.key + "?sendObject=") == 0) {
         res.writeHead(200); // OK
-        var json_text = url;
-        json_text = json_text.replace("/" + _httpServer.key + "/sendObject/", "");
+        var json_text = decodeURIComponent(url);
+        json_text = json_text.replace("/" + _httpServer.key + "?sendObject=", "");
         _proxyOnReceiveObjectFromRenderPane(json_text);
         res.write("{}");
         res.end("");
