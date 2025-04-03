@@ -1,11 +1,11 @@
-﻿// HmCustomRenderServer.WebView2.js ver 2.2.0.1
+﻿// HmCustomRenderServer.WebView2.js ver 2.3.0.1
 var _currentMacroDirectory = currentmacrodirectory();
 
-if (typeof (_httpServer) != "undefined") {
-    _httpServer.close();
+if (typeof (_httpServer1) != "undefined") {
+    _httpServer1.close();
 }
 
-var _httpServer = hidemaru.createHttpServer({ makeKey: 1 }, async (req, res) => {
+var _httpServer1 = hidemaru.createHttpServer({ makeKey: 1 }, async (req, res) => {
 
     var url = req.url;
 
@@ -14,15 +14,31 @@ var _httpServer = hidemaru.createHttpServer({ makeKey: 1 }, async (req, res) => 
         url = await req.url;
     }
 
-    if (url == "/" + _httpServer.key) {
+    if (url == "/" + _httpServer1.key) {
         res.writeHead(200); // OK
         var obj = onRequestObject();
         res.write(JSON.stringify(obj));
         res.end("");
-    } else if (url.indexOf("/" + _httpServer.key + "?sendObject=") == 0) {
+    } else {
+        res.writeHead(404); // Not found
+        res.end("");
+    }
+});
+
+
+var _httpServer2 = hidemaru.createHttpServer({ makeKey: 1 }, async (req, res) => {
+
+    var url = req.url;
+
+    // ここはパッチだと思って!!
+    if (typeof (url) != "string") {
+        url = await req.url;
+    }
+
+    if (url.indexOf("/" + _httpServer1.key + "?sendObject=") == 0) {
         res.writeHead(200); // OK
         var json_text = decodeURIComponent(url);
-        json_text = json_text.replace("/" + _httpServer.key + "?sendObject=", "");
+        json_text = json_text.replace("/" + _httpServer1.key + "?sendObject=", "");
         _proxyOnReceiveObjectFromRenderPane(json_text);
         res.write("{}");
         res.end("");
@@ -31,6 +47,7 @@ var _httpServer = hidemaru.createHttpServer({ makeKey: 1 }, async (req, res) => 
         res.end("");
     }
 });
+
 
 // 非同期関数なので非同期中に使える関数で構築する必要あり
 function onRequestObject() {
@@ -51,10 +68,11 @@ function _proxyOnReceiveObjectFromRenderPane(json_text) {
     }
 }
 
-function _makeUrl(htmlFullPath, port, key, funcid) {
+function _makeUrl(htmlFullPath, port1, port2, key, funcid) {
     var absoluteUrl = new URL(htmlFullPath);
     var params = new URLSearchParams();
-    params.set("port", String(port));
+    params.set("port1", String(port1));
+    params.set("port2", String(port2));
     params.set("key", String(key));
     params.set("funcid", String(funcid));
     absoluteUrl.search = new URLSearchParams(params).toString();
@@ -70,15 +88,16 @@ function _outputAlert(msg) {
 // メインの処理
 function _showCustomRenderBrowser() {
 
-    _httpServer.listen(0); //ランダムなポート
+    _httpServer1.listen(0); //ランダムなポート
+    _httpServer2.listen(0); //ランダムなポート
 
-    if (_httpServer.port == 0) {
+    if (_httpServer1.port == 0 || _httpServer2.port == 0) {
         _outputAlert("サーバー構築失敗");
         return;
     }
 
     var funcid = hidemaru.getFunctionId(_proxyOnReceiveObjectFromRenderPane);
-    var url = _makeUrl(_currentMacroDirectory + "\\HmCustomRenderBrowser.html", _httpServer.port, _httpServer.key, funcid);
+    var url = _makeUrl(_currentMacroDirectory + "\\HmCustomRenderBrowser.html", _httpServer1.port, _httpServer2.port, _httpServer1.key, funcid);
 
     if (showCustomRenderPane) { 
         showCustomRenderPane(url);

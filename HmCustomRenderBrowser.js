@@ -2,13 +2,14 @@
 (function() {
     // ファイルURLからポート番号を取得
     let urlLocationParams = new URLSearchParams(window.location.search);
-    let urlLocationPort = Number(urlLocationParams.get('port'));
+    let urlLocationPort1 = Number(urlLocationParams.get('port1'));
+    let urlLocationPort2 = Number(urlLocationParams.get('port2'));
     let urlLocationKey = urlLocationParams.get('key');
     let urlFuncID = Number(urlLocationParams.get('funcid'));
 
     async function updateTick(callBackFunc) {
 
-        fetch(`http://localhost:${urlLocationPort}/${urlLocationKey}`)
+        fetch(`http://localhost:${urlLocationPort1}/${urlLocationKey}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -53,7 +54,7 @@
 
         sendObject(obj) {
             let text = JSON.stringify(obj);
-            fetch(`http://localhost:${urlLocationPort}/${urlLocationKey}?sendObject=${encodeURIComponent(text)}`)
+            fetch(`http://localhost:${urlLocationPort2}/${urlLocationKey}?sendObject=${encodeURIComponent(text)}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
