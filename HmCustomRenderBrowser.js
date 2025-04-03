@@ -1,4 +1,4 @@
-// HmCustomRenderBrowser.js ver 2.4.1.1
+// HmCustomRenderBrowser.js ver 2.4.2.1
 (function() {
     // ファイルURLからポート番号を取得
     let urlLocationParams = new URLSearchParams(window.location.search);
@@ -49,7 +49,7 @@
             window.chrome.webview.postMessage({ funcid: urlFuncID, message: json });
         },
 
-        sendObject: async function(obj) {
+        sendObject: async function(obj, callBackFunc) {
 
             // ロック開始
             while (isSendingLock) {
@@ -64,7 +64,13 @@
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                if (typeof(callBackFunc) == "function") {
+                    callBackFunc(response, null)
+                }
             } catch (error) {
+                if (typeof(callBackFunc) == "function") {
+                    callBackFunc(null, error)
+                }
             } finally {
                 isSendingLock = false;
             }
