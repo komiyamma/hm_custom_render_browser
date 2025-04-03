@@ -1,4 +1,4 @@
-// HmCustomRenderBrowser.js ver 2.2.0.1
+// HmCustomRenderBrowser.js ver 2.3.1.1
 (function() {
     // ファイルURLからポート番号を取得
     let urlLocationParams = new URLSearchParams(window.location.search);

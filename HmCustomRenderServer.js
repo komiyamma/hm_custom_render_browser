@@ -1,8 +1,11 @@
-﻿// HmCustomRenderServer.js ver 2.3.0.1
+﻿// HmCustomRenderServer.js ver 2.3.1.1
 var _currentMacroDirectory = currentmacrodirectory();
 
 if (typeof (_httpServer1) != "undefined") {
     _httpServer1.close();
+}
+if (typeof (_httpServer2) != "undefined") {
+    _httpServer2.close();
 }
 
 var _httpServer1 = hidemaru.createHttpServer({ makeKey: 1 }, function (req, res) {
