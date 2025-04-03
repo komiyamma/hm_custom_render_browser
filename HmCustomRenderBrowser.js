@@ -1,4 +1,4 @@
-// HmCustomRenderBrowser.js ver 2.3.1.1
+// HmCustomRenderBrowser.js ver 2.4.1.1
 (function() {
     // ファイルURLからポート番号を取得
     let urlLocationParams = new URLSearchParams(window.location.search);
@@ -7,26 +7,23 @@
     let urlLocationKey = urlLocationParams.get('key');
     let urlFuncID = Number(urlLocationParams.get('funcid'));
 
-    async function updateTick(callBackFunc) {
+    // ロック用のフラグ
+    let isSendingLock = false;    
 
-        fetch(`http://localhost:${urlLocationPort1}/${urlLocationKey}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json(); // テキストとして来るが、JSONもテキストなので、JSONオブジェクト解釈。
-            })
-            .then(obj => {
-                if (typeof(callBackFunc) == "function") {
-                    callBackFunc(obj, null);
-                }
-            })
-            .catch(error => {
-                if (typeof(callBackFunc) == "function") {
-                    callBackFunc(null, error);
-                }
+    async function updateTick(callBackFunc) {
+        try {
+            const response = await fetch(`http://localhost:${urlLocationPort1}/${urlLocationKey}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            );
+
+            const obj = await response.json();
+            callBackFunc(obj, null); // 成功した場合はオブジェクトとnullを渡す
+
+        } catch (error) {
+            callBackFunc(null, error); // エラーの場合はnullとエラーオブジェクトを渡す
+        }
     }
 
     HmCustomRenderBrowser = {
@@ -47,22 +44,30 @@
              window.clearTimeout(timerHandle);
         },
 
-        sendObjectFromRenderPane(obj) {
+        sendObjectFromRenderPane: function(obj) {
             var json = JSON.stringify(obj);
             window.chrome.webview.postMessage({ funcid: urlFuncID, message: json });
         },
 
-        sendObject(obj) {
-            let text = JSON.stringify(obj);
-            fetch(`http://localhost:${urlLocationPort2}/${urlLocationKey}?sendObject=${encodeURIComponent(text)}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                })
-                .catch(error => {
+        sendObject: async function(obj) {
+
+            // ロック開始
+            while (isSendingLock) {
+                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms毎にチェック
+            }
+            isSendingLock = true;
+
+            try {
+                let text = JSON.stringify(obj);
+                const response = await fetch(`http://localhost:${urlLocationPort2}/${urlLocationKey}?sendObject=${encodeURIComponent(text)}`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            );
+            } catch (error) {
+            } finally {
+                isSendingLock = false;
+            }
         }
     }
 })();
