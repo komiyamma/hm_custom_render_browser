@@ -1,4 +1,4 @@
-// HmCustomRenderBrowser.js ver 2.4.2.1
+// HmCustomRenderBrowser.js ver 2.4.4.1
 (function() {
     // ファイルURLからポート番号を取得
     let urlLocationParams = new URLSearchParams(window.location.search);
@@ -9,9 +9,16 @@
 
     // ロック用のフラグ
     let isSendingLock = false;    
+    let isReceiveLock = false;    
 
     async function updateTick(callBackFunc) {
         try {
+            // ロック開始
+            while (isReceiveLock) {
+                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms毎にチェック
+            }
+            isReceiveLock = true;
+
             const response = await fetch(`http://localhost:${urlLocationPort1}/${urlLocationKey}`);
 
             if (!response.ok) {
@@ -23,6 +30,8 @@
 
         } catch (error) {
             callBackFunc(null, error); // エラーの場合はnullとエラーオブジェクトを渡す
+        } finally {
+            isReceiveLock = false;
         }
     }
 
@@ -51,13 +60,13 @@
 
         sendObject: async function(obj, callBackFunc) {
 
-            // ロック開始
-            while (isSendingLock) {
-                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms毎にチェック
-            }
-            isSendingLock = true;
-
             try {
+                // ロック開始
+                while (isSendingLock) {
+                    await new Promise(resolve => setTimeout(resolve, 100)); // 100ms毎にチェック
+                }
+                isSendingLock = true;
+
                 let text = JSON.stringify(obj);
                 const response = await fetch(`http://localhost:${urlLocationPort2}/${urlLocationKey}?sendObject=${encodeURIComponent(text)}`);
 
