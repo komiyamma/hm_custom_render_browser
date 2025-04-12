@@ -73,11 +73,12 @@ function _proxyOnReceiveObjectFromRenderPane(json_text) {
 
 function _makeUrl(htmlFullPath, port1, port2, key, funcid) {
     var absoluteUrl = new URL(htmlFullPath);
-    var params = new URLSearchParams();
-    params.set("port1", String(port1));
-    params.set("port2", String(port2));
-    params.set("key", String(key));
-    params.set("funcid", String(funcid));
+    var params = new URLSearchParams({
+        port1: String(port1),
+        port2: String(port2),
+        key: String(key),
+        funcid: String(funcid),
+    });
     absoluteUrl.search = params.toString();
     return absoluteUrl.href;
 }
