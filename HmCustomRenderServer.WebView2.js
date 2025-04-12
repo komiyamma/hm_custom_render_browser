@@ -1,4 +1,4 @@
-﻿// HmCustomRenderServer.WebView2.js ver 2.4.4.1
+﻿// HmCustomRenderServer.WebView2.js ver 2.4.4.2
 var _currentMacroDirectory = currentmacrodirectory();
 
 if (typeof (_httpServer1) != "undefined") {
@@ -78,7 +78,7 @@ function _makeUrl(htmlFullPath, port1, port2, key, funcid) {
     params.set("port2", String(port2));
     params.set("key", String(key));
     params.set("funcid", String(funcid));
-    absoluteUrl.search = new URLSearchParams(params).toString();
+    absoluteUrl.search = params.toString();
     return absoluteUrl.href;
 }
 
