@@ -1,4 +1,4 @@
-// HmCustomRenderBrowser.js ver 2.4.4.1
+// HmCustomRenderBrowser.js ver 2.4.4.2
 (function() {
     // ファイルURLからポート番号を取得
     let urlLocationParams = new URLSearchParams(window.location.search);
@@ -8,31 +8,29 @@
     let urlFuncID = Number(urlLocationParams.get('funcid'));
 
     // ロック用のフラグ
-    let isSendingLock = false;    
-    let isReceiveLock = false;    
+    let sendingLock = Promise.resolve();   
+    let receiveLock = Promise.resolve();   
 
     async function updateTick(callBackFunc) {
-        try {
-            // ロック開始
-            while (isReceiveLock) {
-                await new Promise(resolve => setTimeout(resolve, 100)); // 100ms毎にチェック
-            }
-            isReceiveLock = true;
+        // 前回の完了を保証
+        await receiveLock;
 
-            const response = await fetch(`http://localhost:${urlLocationPort1}/${urlLocationKey}`);
+        receiveLock = (async () => {
+            try {
+                const response = await fetch(`http://localhost:${urlLocationPort1}/${urlLocationKey}`);
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
 
-            const obj = await response.json();
-            callBackFunc(obj, null); // 成功した場合はオブジェクトとnullを渡す
-
-        } catch (error) {
-            callBackFunc(null, error); // エラーの場合はnullとエラーオブジェクトを渡す
-        } finally {
-            isReceiveLock = false;
-        }
+                const obj = await response.json();
+                callBackFunc(obj, null); // 成功した場合はオブジェクトとnullを渡す
+            } catch (error) {
+                callBackFunc(null, error); // エラーの場合はnullとエラーオブジェクトを渡す
+            };
+        })();
+        
+        await receiveLock; // リクエストの完了を保証
     }
 
     HmCustomRenderBrowser = {
@@ -60,29 +58,28 @@
 
         sendObject: async function(obj, callBackFunc) {
 
-            try {
-                // ロック開始
-                while (isSendingLock) {
-                    await new Promise(resolve => setTimeout(resolve, 100)); // 100ms毎にチェック
-                }
-                isSendingLock = true;
+            // 前回の完了を保証
+            await sendingLock;
+            
+            sendingLock = (async () => {
+                try {
+                    let text = JSON.stringify(obj);
+                    const response = await fetch(`http://localhost:${urlLocationPort2}/${urlLocationKey}?sendObject=${encodeURIComponent(text)}`);
 
-                let text = JSON.stringify(obj);
-                const response = await fetch(`http://localhost:${urlLocationPort2}/${urlLocationKey}?sendObject=${encodeURIComponent(text)}`);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    if (typeof(callBackFunc) == "function") {
+                        callBackFunc(response, null)
+                    }
+                } catch (error) {
+                    if (typeof(callBackFunc) == "function") {
+                        callBackFunc(null, error)
+                    }
                 }
-                if (typeof(callBackFunc) == "function") {
-                    callBackFunc(response, null)
-                }
-            } catch (error) {
-                if (typeof(callBackFunc) == "function") {
-                    callBackFunc(null, error)
-                }
-            } finally {
-                isSendingLock = false;
-            }
+            })();
+            
+            await sendingLock; // リクエストの完了を保証
         }
     }
 })();
