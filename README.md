@@ -1,7 +1,7 @@
 # HmCustomRenderBrowser
 
-[![CC0](https://img.shields.io/badge/license-CC0-blue.svg?style=flat)](LICENSE.txt)
 [![HmCustomRenderBrowser latest release](https://img.shields.io/github/v/release/komiyamma/hm_custom_render_browser?style=flat)](https://github.com/komiyamma/hm_custom_render_browser/releases)
+[![CC0](https://img.shields.io/badge/license-CC0-blue.svg?style=flat)](LICENSE.txt)
 
 秀丸エディタのコンテンツをブラウザペインに表示し、Web技術（HTML/CSS/JS）で自由にレンダリングするためのフレームワークです。
 
